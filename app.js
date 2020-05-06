@@ -2,14 +2,33 @@ const path = require('path');
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
+const multer= require('multer');
 const app = express();
 require ('custom-env').env('staging')
 
 
 
 const feedRoutes = require('./routes/feed');
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + '-' + file.originalname)
+    },
+})
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png'
+    || file.mimetype === 'image/jpg' 
+    || file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    }
+    cb(null, false)
+}
 
 app.use(bodyParser.json()); //this will make incoming data be parsed to json .
+app.use(multer({storage: fileStorage, fileFilter:fileFilter}).single('image'))
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {  // here i want to add headers so i can allow requests from different servers to be allowed in the app

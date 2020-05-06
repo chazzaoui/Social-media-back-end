@@ -14,18 +14,24 @@ exports.addPost = (req, res, next) => {
         error.statusCode = 422;
         throw error;
     }
+    if(!req.file){
+        const error = new Error('No file provided!');
+        error.statusCode = 422
+        throw error;
+    }
+    const imageUrl = req.file.path
     const title = req.body.title;
     const content = req.body.content
     const post = new Post({
         title,
         content,
-        imageUrl: '0.jpeg',
+        imageUrl,
         creator:{
             name: 'Chaffie'
         },
     })
-    post.save().then(res =>{
-         console.log(res)
+    post.save().then(result =>{
+         console.log(result)
          res.status(201).json({ message: "post uploaded successfully!", post: res })
     })
     .catch(err => { 
