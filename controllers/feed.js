@@ -1,5 +1,14 @@
 exports.getPost = (req, res, next) => {
-    res.status(200).json({posts: [{title: 'This is a post', content: "I hope you enjoy this"}]})
+    res.status(200).json({posts: [{
+        _id: Math.random(),
+     title: 'This is a post',
+     content: "I hope you enjoy this", 
+     imageUrl: 'images/0.jpeg', 
+     creator:{
+        name: "Chaffie"
+    },
+    createdAt: new Date()
+}]})
 }
 
 exports.addPost = (req, res, next) => {
