@@ -10,7 +10,7 @@ require ('custom-env').env('staging')
 const feedRoutes = require('./routes/feed');
 
 app.use(bodyParser.json()); //this will make incoming data be parsed to json .
-app.use('./images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {  // here i want to add headers so i can allow requests from different servers to be allowed in the app
 res.setHeader('Access-Control-Allow-Origin', '*'); // here we allow specific origins to allow our data, the * makes evreyone able to acces it
