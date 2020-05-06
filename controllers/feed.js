@@ -1,3 +1,5 @@
+const {validationResult} = require('express-validator/check')
+
 exports.getPost = (req, res, next) => {
     res.status(200).json({posts: [{
         _id: Math.random(),
@@ -12,6 +14,10 @@ exports.getPost = (req, res, next) => {
 }
 
 exports.addPost = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){ //means we have errors
+        return res.status(422).json({message: 'Entered data does not meet min length requirement', errors: errors.array()})
+    }
     const title = req.body.title;
     const content = req.body.content
     res.status(201).json({ message: "post uploaded successfully!", post:{ _id: new Date().toISOString() , title, content, creator:{
