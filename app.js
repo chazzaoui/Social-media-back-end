@@ -1,6 +1,10 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+require ('custom-env').env('staging')
+
+
 
 const feedRoutes = require('./routes/feed');
 
@@ -14,4 +18,9 @@ next();
 })
 app.use('/feed', feedRoutes);
 
-app.listen(8080);
+mongoose.connect(process.env.DB_HOST, { useNewUrlParser: true, useUnifiedTopology: true }  )
+.then(() => {
+
+    app.listen(8080);
+})
+.catch(err => console.log(err))
