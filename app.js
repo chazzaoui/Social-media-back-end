@@ -33,7 +33,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {  // here i want to add headers so i can allow requests from different servers to be allowed in the app
 res.setHeader('Access-Control-Allow-Origin', '*'); // here we allow specific origins to allow our data, the * makes evreyone able to acces it
-res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT'); // here we specify which methods are allowed from the request
+res.setHeader('Access-Control-Allow-Methods', 'DELETE, GET, POST, PUT'); // here we specify which methods are allowed from the request
 res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); //specifies which header types are allowed
 next();
 })
