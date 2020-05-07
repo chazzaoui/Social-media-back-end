@@ -4,9 +4,24 @@ const {validationResult} = require('express-validator')
 const Post = require('../models/post')
 
 exports.getPosts = (req, res, next) => {
-    Post.find().then( result => {
-        res.status(200).json({posts: result })
-    }).catch(err => console.log(err))
+    const currentPage = req.query.page || 1;
+    const perPage = 2;
+    let totalItems;
+    Post.find().countDocuments()
+    .then(count => {
+        totalItems= count
+       return Post.find().skip((currentPage - 1) * perPage) //returns page minus the items i already have
+    .limit(perPage)
+    })
+    .then( result => {
+        res.status(200).json({posts: result, totalItems })
+        })
+    .catch(err => { 
+        if (!err.statusCode){
+            err.statusCode = 500
+        } 
+        next(err);
+    })
 }
 
 exports.addPost = (req, res, next) => {
@@ -34,7 +49,7 @@ exports.addPost = (req, res, next) => {
     })
     post.save().then(result =>{
          console.log(result)
-         res.status(201).json({ message: "post uploaded successfully!", post: res })
+         res.status(201).json({ message: "post uploaded successfully!", post: result })
     })
     .catch(err => { 
         if (!err.statusCode){
