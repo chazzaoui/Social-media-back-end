@@ -9,6 +9,8 @@ require ('custom-env').env('staging')
 
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
+
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'images')
@@ -37,13 +39,16 @@ res.setHeader('Access-Control-Allow-Methods', 'DELETE, GET, POST, PUT'); // here
 res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); //specifies which header types are allowed
 next();
 })
+
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error)
     const status = error.statusCode || 500;
     const message = error.message; //can be set globally in script by setting error.message
-    res.status(status).json({message})
+    const data = error.data;
+    res.status(status).json({message, data})
 })
 
 mongoose.connect(process.env.DB_HOST, { useNewUrlParser: true, useUnifiedTopology: true }  )
