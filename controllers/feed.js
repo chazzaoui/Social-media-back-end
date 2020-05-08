@@ -178,8 +178,9 @@ exports.deletePost = (req, res, next) => {
     })
     .then((user) => {
       user.posts.pull(postId); //provided by mongoose, removes an item from array
-      return user.save()
-    }).then(() => {
+      return user.save();
+    })
+    .then(() => {
       res.status(200).json({ message: "Deleted Succesfully!" });
     })
     .catch((err) => {
@@ -193,21 +194,54 @@ exports.deletePost = (req, res, next) => {
 
 exports.getStatus = (req, res, next) => {
   const userId = req.userId;
-  User.findById(userId).then(user => {
-    if (!user){
-      const error = new Error("Could not find user with this id!");
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        const error = new Error("Could not find user with this id!");
         error.statusCode = 404;
         throw error;
-    }
-   return res.status(200).json({ message: "Found status", user  });
-  }).catch((err) => {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
-    console.log(err);
-    next(err);
-  });
-}
+      }
+      return res.status(200).json({ message: "Found status", user });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      console.log(err);
+      next(err);
+    });
+};
+
+exports.editStatus = (req, res, next) => {
+  const userId = req.userId;
+  const status = req.body.status;
+
+  if (!status){
+    const error = new Error('Empty status input!')
+    error.statusCode(401);
+    throw error;
+  }
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        const error = new Error("Could not find user with this id!");
+        error.statusCode = 404;
+        throw error;
+      }
+      user.status = status;
+      return user.save();
+    })
+    .then((result) => {
+      res.status(200).json({ message: "succesfully updated status!"});
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      console.log(err);
+      next(err);
+    });
+};
 
 const clearImage = (filePath) => {
   filePath = path.join(__dirname, "..", filePath);
