@@ -131,15 +131,17 @@ exports.editPost = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
+      if (post.creator.toString() !== req.userId) {
+        const error = new Error("Not authorized!");
+        error.statusCode = 401;
+        throw error;
+      }
       if (imageUrl !== post.imageUrl) {
         clearImage(post.imageUrl);
       }
       post.title = title;
       post.content = content;
       post.imageUrl = imageUrl;
-      post.creator = {
-        name: "Chaffie",
-      };
       return post.save();
     })
     .then((result) => {
@@ -163,10 +165,21 @@ exports.deletePost = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
+      if (post.creator.toString() !== req.userId) {
+        const error = new Error("Not authorized!");
+        error.statusCode = 401;
+        throw error;
+      }
       clearImage(post.imageUrl);
       return Post.findByIdAndRemove(postId);
     })
     .then((result) => {
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      user.posts.pull(postId); //provided by mongoose, removes an item from array
+      return user.save()
+    }).then(() => {
       res.status(200).json({ message: "Deleted Succesfully!" });
     })
     .catch((err) => {
