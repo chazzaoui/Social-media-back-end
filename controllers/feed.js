@@ -191,6 +191,24 @@ exports.deletePost = (req, res, next) => {
     });
 };
 
+exports.getStatus = (req, res, next) => {
+  const userId = req.userId;
+  User.findById(userId).then(user => {
+    if (!user){
+      const error = new Error("Could not find user with this id!");
+        error.statusCode = 404;
+        throw error;
+    }
+   return res.status(200).json({ message: "Found status", user  });
+  }).catch((err) => {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    console.log(err);
+    next(err);
+  });
+}
+
 const clearImage = (filePath) => {
   filePath = path.join(__dirname, "..", filePath);
   fs.unlink(filePath, (err) => console.log(err));
