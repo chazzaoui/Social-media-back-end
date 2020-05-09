@@ -10,6 +10,7 @@ exports.getPosts = async (req, res, next) => {
   try {
     const totalItems = await Post.find().countDocuments();
     const posts = await Post.find()
+    .populate('creator')
       .skip((currentPage - 1) * perPage) //returns page minus the items i already have
       .limit(perPage);
 
@@ -48,12 +49,12 @@ exports.addPost = async (req, res, next) => {
       imageUrl,
       creator: req.userId,
     });
-    post.save();
+   await post.save();
 
     const user = await User.findById(req.userId);
     creator = user;
     user.posts.push(post);
-    user.save();
+    await user.save();
 
     res.status(201).json({
       message: "post uploaded successfully!",
@@ -165,7 +166,7 @@ exports.deletePost = async (req, res, next) => {
     const user = await User.findById(req.userId);
 
     user.posts.pull(postId); //provided by mongoose, removes an item from array
-    user.save();
+    await user.save();
 
     res.status(200).json({ message: "Deleted Succesfully!" });
   } catch (err) {
@@ -214,7 +215,7 @@ exports.editStatus = async (req, res, next) => {
       throw error;
     }
     user.status = status;
-    user.save();
+    await user.save();
 
     res.status(200).json({ message: "succesfully updated status!" });
   } catch (err) {
