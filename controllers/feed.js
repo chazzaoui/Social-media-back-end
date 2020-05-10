@@ -166,17 +166,20 @@ exports.deletePost = async (req, res, next) => {
     }
     if (post.creator.toString() !== req.userId) {
       const error = new Error("Not authorized!");
-      error.statusCode = 401;
+      error.statusCode = 403;
       throw error;
     }
     clearImage(post.imageUrl);
-    Post.findByIdAndRemove(postId);
+    await Post.findByIdAndRemove(postId);
 
     const user = await User.findById(req.userId);
 
     user.posts.pull(postId); //provided by mongoose, removes an item from array
     await user.save();
-
+    io.getIO().emit("posts", {
+      action: "delete",
+      post: postId,
+    });
     res.status(200).json({ message: "Deleted Succesfully!" });
   } catch (err) {
     if (!err.statusCode) {
