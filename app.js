@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 const multer = require("multer");
+const graphqlHttp = require("express-graphql");
+const gqSchema = require("./graphql/schema");
+const gqResolver = require("./graphql/resolver");
 const app = express();
 require("custom-env").env("staging");
-
-const feedRoutes = require("./routes/feed");
-const authRoutes = require("./routes/auth");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -43,8 +43,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/feed", feedRoutes);
-app.use("/auth", authRoutes);
+app.use(
+  "/graphql",
+  graphqlHttp({
+    schema: gqSchema,
+    rootValue: gqResolver,
+  })
+);
 
 app.use((error, req, res, next) => {
   console.log(error);
@@ -60,10 +65,6 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    const server = app.listen(8080);
-    const io = require('./socket').init(server);
-    io.on('connection', socket => {
-        console.log('Client connected!');
-    })
+    app.listen(8080);
   })
   .catch((err) => console.log(err));
