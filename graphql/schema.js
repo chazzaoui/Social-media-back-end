@@ -31,6 +31,11 @@ type Mutation {
     createUser(userInput: UserInput): User!
 }
 
+type RootQuery {
+    hello: String
+}
+
 schema {
+    query: RootQuery
     mutation: Mutation
 }`);
