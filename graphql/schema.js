@@ -27,12 +27,18 @@ input UserInput {
     password: String!
 }
 
+type AuthData {
+    token: String!
+    userId: String!
+
+}
+
 type Mutation {
     createUser(userInput: UserInput): User!
 }
 
 type RootQuery {
-    hello: String
+    login(email: String!, password: String!): AuthData!
 }
 
 schema {
