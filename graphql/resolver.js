@@ -43,7 +43,7 @@ module.exports = {
     const user = await User.findOne({ email });
     if (!user) {
       const error = new Error("User does not exist!");
-      error.code = 401;
+      error.code = 404;
       throw error;
     }
     const isEqual = await bcrypt.compare(password, user.password)
