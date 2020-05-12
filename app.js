@@ -8,6 +8,7 @@ const gqSchema = require("./graphql/schema");
 const gqResolver = require("./graphql/resolver");
 const app = express();
 require("custom-env").env("staging");
+const auth = require('./middleware/auth');
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -46,6 +47,7 @@ app.use((req, res, next) => {
 
   next();
 });
+app.use(auth); //wil return is auth, which can be used for authorization in graphql
 
 app.use(
   "/graphql",

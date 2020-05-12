@@ -27,6 +27,12 @@ input UserInput {
     password: String!
 }
 
+input PostInput {
+    title: String!
+    content: String!
+    imageUrl: String!
+}
+
 type AuthData {
     token: String!
     userId: String!
@@ -35,6 +41,7 @@ type AuthData {
 
 type Mutation {
     createUser(userInput: UserInput): User!
+    createPost(postInput: PostInput): Post!
 }
 
 type RootQuery {
