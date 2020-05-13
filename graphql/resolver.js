@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 require("custom-env").env("staging");
-const {clearImage}= require('../utils/file')
+const { clearImage }= require('../utils/file')
 
 module.exports = {
   createUser: async function ({ userInput }, req) {
