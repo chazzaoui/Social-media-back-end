@@ -39,6 +39,11 @@ type AuthData {
 
 }
 
+type PostData {
+    posts: [Post!]!
+    totalPosts: Int!
+}
+
 type Mutation {
     createUser(userInput: UserInput): User!
     createPost(postInput: PostInput): Post!
@@ -46,6 +51,7 @@ type Mutation {
 
 type RootQuery {
     login(email: String!, password: String!): AuthData!
+    getPost: PostData!
 }
 
 schema {
