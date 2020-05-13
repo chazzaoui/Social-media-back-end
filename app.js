@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const express = require("express");
@@ -8,7 +9,7 @@ const gqSchema = require("./graphql/schema");
 const gqResolver = require("./graphql/resolver");
 const app = express();
 require("custom-env").env("staging");
-const auth = require('./middleware/auth');
+const auth = require("./middleware/auth");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -39,15 +40,35 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 app.use((req, res, next) => {
   // here i want to add headers so i can allow requests from different servers to be allowed in the app
   res.setHeader("Access-Control-Allow-Origin", "*"); // here we allow specific origins to allow our data, the * makes evreyone able to acces it
-  res.setHeader("Access-Control-Allow-Methods", "OPTIONS, DELETE, GET, POST, PUT"); // here we specify which methods are allowed from the request
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "OPTIONS, DELETE, GET, POST, PUT"
+  ); // here we specify which methods are allowed from the request
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); //specifies which header types are allowed
-  if (req.method === 'OPTIONS'){
+  if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
 
   next();
 });
+
 app.use(auth); //wil return is auth, which can be used for authorization in graphql
+
+app.put("/post-image", (req, res, next) => {
+  if (!req.isAuth){
+    throw new Error('Not authorized!')
+  }
+  if (!req.file) {
+    return res.status(200).json({ message: "No file provided!" });
+  }
+  if (req.body.oldPath) {
+    clearImage(req.body.oldPath);
+  }
+  return res
+    .status(200)
+    .json({ message: "File stored succesfully", filePath: req.file.path });
+});
+
 
 app.use(
   "/graphql",
@@ -60,9 +81,9 @@ app.use(
         return err;
       }
       const data = err.originalError.data;
-      const message = err.message || 'An error occured'
+      const message = err.message || "An error occured";
       const code = err.originalError.code || 500;
-      return {message, data, status: code}
+      return { message, data, status: code };
     },
   })
 );
@@ -84,3 +105,8 @@ mongoose
     app.listen(8080);
   })
   .catch((err) => console.log(err));
+
+const clearImage = (filePath) => {
+  filePath = path.join(__dirname, "..", filePath);
+  fs.unlink(filePath, (err) => console.log(err));
+};
