@@ -49,12 +49,14 @@ type Mutation {
     createPost(postInput: PostInput): Post!
     updatePost(id: ID!, postInput: PostInput): Post!
     deletePost(id: ID!): Boolean
+    updateStatus(status: String!): User!
 }
 
 type RootQuery {
     login(email: String!, password: String!): AuthData!
     getPost(page: Int!): PostData!
     getSinglePost(id: ID!): Post!
+    user: User!
 }
 
 schema {
