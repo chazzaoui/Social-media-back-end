@@ -1,4 +1,4 @@
-const fs = require("fs");
+const { clearImage } = require("./utils/file");
 const path = require("path");
 const mongoose = require("mongoose");
 const express = require("express");
@@ -55,8 +55,8 @@ app.use((req, res, next) => {
 app.use(auth); //wil return is auth, which can be used for authorization in graphql
 
 app.put("/post-image", (req, res, next) => {
-  if (!req.isAuth){
-    throw new Error('Not authorized!')
+  if (!req.isAuth) {
+    throw new Error("Not authorized!");
   }
   if (!req.file) {
     return res.status(200).json({ message: "No file provided!" });
@@ -68,7 +68,6 @@ app.put("/post-image", (req, res, next) => {
     .status(200)
     .json({ message: "File stored succesfully", filePath: req.file.path });
 });
-
 
 app.use(
   "/graphql",
@@ -106,7 +105,3 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-const clearImage = (filePath) => {
-  filePath = path.join(__dirname, "..", filePath);
-  fs.unlink(filePath, (err) => console.log(err));
-};
