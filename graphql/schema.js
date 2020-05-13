@@ -47,6 +47,7 @@ type PostData {
 type Mutation {
     createUser(userInput: UserInput): User!
     createPost(postInput: PostInput): Post!
+    updatePost(id: ID!, postInput: PostInput): Post!
 }
 
 type RootQuery {
