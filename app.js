@@ -8,8 +8,10 @@ const graphqlHttp = require("express-graphql");
 const gqSchema = require("./graphql/schema");
 const gqResolver = require("./graphql/resolver");
 const app = express();
-require("custom-env").env("staging");
+const helmet = require('helmet');
+const compression = require('compression');
 const auth = require("./middleware/auth");
+require("custom-env").env("staging");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -36,7 +38,8 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
 app.use("/images", express.static(path.join(__dirname, "images")));
-
+app.use(helmet());
+app.use(compression());
 app.use((req, res, next) => {
   // here i want to add headers so i can allow requests from different servers to be allowed in the app
   res.setHeader("Access-Control-Allow-Origin", "*"); // here we allow specific origins to allow our data, the * makes evreyone able to acces it
