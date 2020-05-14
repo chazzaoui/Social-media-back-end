@@ -1,5 +1,6 @@
 const { clearImage } = require("./utils/file");
 const path = require("path");
+const fs = require("fs");
 const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -8,8 +9,9 @@ const graphqlHttp = require("express-graphql");
 const gqSchema = require("./graphql/schema");
 const gqResolver = require("./graphql/resolver");
 const app = express();
-const helmet = require('helmet');
-const compression = require('compression');
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 const auth = require("./middleware/auth");
 require("custom-env").env("staging");
 
@@ -37,9 +39,17 @@ app.use(bodyParser.json()); //this will make incoming data be parsed to json .
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
+
+const accesLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" } //adds log statement continuosly to the file
+);
+
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(helmet());
 app.use(compression());
+app.use(morgan("combined", {stream:accesLogStream}));
+
 app.use((req, res, next) => {
   // here i want to add headers so i can allow requests from different servers to be allowed in the app
   res.setHeader("Access-Control-Allow-Origin", "*"); // here we allow specific origins to allow our data, the * makes evreyone able to acces it
@@ -107,4 +117,3 @@ mongoose
     app.listen(8080);
   })
   .catch((err) => console.log(err));
-
